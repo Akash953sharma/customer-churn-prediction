@@ -19,52 +19,173 @@ def home():
         monthly = float(request.form["MonthlyCharges"])
         total = float(request.form["TotalCharges"])
 
-        data = pd.DataFrame({
+        input_data = pd.DataFrame({
             "SeniorCitizen": [senior],
             "tenure": [tenure],
             "MonthlyCharges": [monthly],
             "TotalCharges": [total]
         })
 
-        prediction = model.predict(data)
+        try:
+            prediction = model.predict(input_data)
 
-        if prediction[0] == 1:
-            result = "⚠️ Customer May Churn"
-        else:
-            result = "✅ Customer Will Stay"
+            if prediction[0] == 1:
+                result = "⚠️ Customer May Churn"
+            else:
+                result = "✅ Customer Will Stay"
 
-    return f"""
-    <html>
-    <body style='font-family:Arial;text-align:center;padding:40px;background:#f5f5f5;'>
+        except:
+            result = "Prediction Error"
 
-    <h1>📊 Customer Churn Prediction</h1>
-    <p><b>Algorithm:</b> Random Forest</p>
+    return f'''
+<!DOCTYPE html>
+<html>
+<head>
+<title>Customer Churn Prediction</title>
 
-    <form method='POST'>
+<style>
 
-        <input type='number' name='SeniorCitizen'
-        placeholder='Senior Citizen (0/1)' required><br><br>
+*{{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
+}}
 
-        <input type='number' name='tenure'
-        placeholder='Tenure (Months)' required><br><br>
+body{{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#667eea,#764ba2);
+}}
 
-        <input type='number' step='0.01'
-        name='MonthlyCharges'
-        placeholder='Monthly Charges' required><br><br>
+.container{{
+width:500px;
+background:rgba(255,255,255,0.15);
+backdrop-filter:blur(15px);
+padding:40px;
+border-radius:20px;
+box-shadow:0 8px 32px rgba(0,0,0,0.3);
+text-align:center;
+color:white;
+}}
 
-        <input type='number' step='0.01'
-        name='TotalCharges'
-        placeholder='Total Charges' required><br><br>
+h1{{
+margin-bottom:10px;
+font-size:36px;
+}}
 
-        <button type='submit'>Predict</button>
+.subtitle{{
+margin-bottom:20px;
+opacity:0.9;
+}}
 
-    </form>
+.info{{
+margin-bottom:25px;
+line-height:1.8;
+}}
 
-    <h2>{result}</h2>
+input{{
+width:100%;
+padding:12px;
+margin:10px 0;
+border:none;
+border-radius:10px;
+font-size:16px;
+}}
 
-    </body>
-    </html>
-    """
+button{{
+background:#00c853;
+color:white;
+border:none;
+padding:12px 30px;
+border-radius:10px;
+font-size:18px;
+cursor:pointer;
+margin-top:10px;
+transition:0.3s;
+}}
+
+button:hover{{
+background:#00a844;
+transform:scale(1.05);
+}}
+
+.result{{
+margin-top:25px;
+font-size:24px;
+font-weight:bold;
+}}
+
+.footer{{
+margin-top:25px;
+font-size:12px;
+opacity:0.8;
+}}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📊 Customer Churn Prediction</h1>
+
+<p class="subtitle">
+Machine Learning Based Prediction System
+</p>
+
+<div class="info">
+<b>Algorithm:</b> Random Forest<br>
+<b>Accuracy:</b> 78.5%<br>
+<b>Developed By:</b> Akash Kumar Sharma
+</div>
+
+<form method="POST">
+
+<input type="number"
+name="SeniorCitizen"
+placeholder="Senior Citizen (0/1)"
+required>
+
+<input type="number"
+name="tenure"
+placeholder="Tenure (Months)"
+required>
+
+<input type="number"
+step="0.01"
+name="MonthlyCharges"
+placeholder="Monthly Charges"
+required>
+
+<input type="number"
+step="0.01"
+name="TotalCharges"
+placeholder="Total Charges"
+required>
+
+<button type="submit">
+Predict
+</button>
+
+</form>
+
+<div class="result">
+{result}
+</div>
+
+<div class="footer">
+© 2026 Customer Churn Prediction Project
+</div>
+
+</div>
+
+</body>
+</html>
+'''
 
 
 if __name__ == "__main__":
