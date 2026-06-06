@@ -7,8 +7,100 @@ app = Flask(__name__)
 model = joblib.load("churn_model.pkl")
 
 
-@app.route("/", methods=["GET", "POST"])
+# HOME PAGE
+@app.route("/")
 def home():
+
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Customer Churn Prediction</title>
+
+        <style>
+
+        body{
+            font-family:Segoe UI;
+            background:linear-gradient(135deg,#667eea,#764ba2);
+            color:white;
+            text-align:center;
+            padding:50px;
+        }
+
+        .container{
+            max-width:800px;
+            margin:auto;
+            background:rgba(255,255,255,0.15);
+            padding:40px;
+            border-radius:20px;
+            backdrop-filter:blur(10px);
+        }
+
+        h1{
+            font-size:42px;
+        }
+
+        p{
+            font-size:18px;
+            line-height:1.8;
+        }
+
+        button{
+            background:#00c853;
+            color:white;
+            border:none;
+            padding:15px 30px;
+            border-radius:10px;
+            font-size:18px;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:#00a844;
+        }
+
+        </style>
+
+    </head>
+
+    <body>
+
+    <div class="container">
+
+        <h1>📊 Customer Churn Prediction</h1>
+
+        <p>
+        Customer Churn Prediction is a Machine Learning project
+        that predicts whether a customer is likely to leave
+        a company's service or continue using it.
+        </p>
+
+        <p>
+        This project uses a Random Forest Classifier and
+        customer data such as tenure, monthly charges and
+        total charges to predict churn behaviour.
+        </p>
+
+        <h3>Algorithm : Random Forest</h3>
+        <h3>Accuracy : 78.5%</h3>
+        <h3>Developer : Akash Kumar Sharma</h3>
+
+        <br>
+
+        <a href="/predict">
+            <button>Start Prediction 🚀</button>
+        </a>
+
+    </div>
+
+    </body>
+    </html>
+    """
+
+
+# PREDICTION PAGE
+@app.route("/predict", methods=["GET", "POST"])
+def predict():
 
     result = ""
 
@@ -19,7 +111,7 @@ def home():
         monthly = float(request.form["MonthlyCharges"])
         total = float(request.form["TotalCharges"])
 
-        input_data = pd.DataFrame({
+        data = pd.DataFrame({
             "SeniorCitizen": [senior],
             "tenure": [tenure],
             "MonthlyCharges": [monthly],
@@ -27,7 +119,8 @@ def home():
         })
 
         try:
-            prediction = model.predict(input_data)
+
+            prediction = model.predict(data)
 
             if prediction[0] == 1:
                 result = "⚠️ Customer May Churn"
@@ -37,155 +130,118 @@ def home():
         except:
             result = "Prediction Error"
 
-    return f'''
-<!DOCTYPE html>
-<html>
-<head>
-<title>Customer Churn Prediction</title>
+    return f"""
+    <!DOCTYPE html>
 
-<style>
+    <html>
+    <head>
 
-*{{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Segoe UI',sans-serif;
-}}
+    <title>Prediction</title>
 
-body{{
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:linear-gradient(135deg,#667eea,#764ba2);
-}}
+    <style>
 
-.container{{
-width:500px;
-background:rgba(255,255,255,0.15);
-backdrop-filter:blur(15px);
-padding:40px;
-border-radius:20px;
-box-shadow:0 8px 32px rgba(0,0,0,0.3);
-text-align:center;
-color:white;
-}}
+    body{{
+        font-family:Segoe UI;
+        background:linear-gradient(135deg,#667eea,#764ba2);
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+    }}
 
-h1{{
-margin-bottom:10px;
-font-size:36px;
-}}
+    .container{{
+        width:500px;
+        background:white;
+        padding:40px;
+        border-radius:20px;
+        text-align:center;
+        box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    }}
 
-.subtitle{{
-margin-bottom:20px;
-opacity:0.9;
-}}
+    input{{
+        width:90%;
+        padding:12px;
+        margin:10px;
+        border-radius:8px;
+        border:1px solid #ccc;
+    }}
 
-.info{{
-margin-bottom:25px;
-line-height:1.8;
-}}
+    button{{
+        background:#4f46e5;
+        color:white;
+        border:none;
+        padding:12px 25px;
+        border-radius:8px;
+        cursor:pointer;
+    }}
 
-input{{
-width:100%;
-padding:12px;
-margin:10px 0;
-border:none;
-border-radius:10px;
-font-size:16px;
-}}
+    .result{{
+        margin-top:20px;
+        font-size:24px;
+        font-weight:bold;
+    }}
 
-button{{
-background:#00c853;
-color:white;
-border:none;
-padding:12px 30px;
-border-radius:10px;
-font-size:18px;
-cursor:pointer;
-margin-top:10px;
-transition:0.3s;
-}}
+    a{{
+        text-decoration:none;
+    }}
 
-button:hover{{
-background:#00a844;
-transform:scale(1.05);
-}}
+    </style>
 
-.result{{
-margin-top:25px;
-font-size:24px;
-font-weight:bold;
-}}
+    </head>
 
-.footer{{
-margin-top:25px;
-font-size:12px;
-opacity:0.8;
-}}
+    <body>
 
-</style>
-</head>
+    <div class="container">
 
-<body>
+        <h1>Prediction Page</h1>
 
-<div class="container">
+        <form method="POST">
 
-<h1>📊 Customer Churn Prediction</h1>
+        <input type="number"
+        name="SeniorCitizen"
+        placeholder="Senior Citizen (0/1)"
+        required>
 
-<p class="subtitle">
-Machine Learning Based Prediction System
-</p>
+        <input type="number"
+        name="tenure"
+        placeholder="Tenure (Months)"
+        required>
 
-<div class="info">
-<b>Algorithm:</b> Random Forest<br>
-<b>Accuracy:</b> 78.5%<br>
-<b>Developed By:</b> Akash Kumar Sharma
-</div>
+        <input type="number"
+        step="0.01"
+        name="MonthlyCharges"
+        placeholder="Monthly Charges"
+        required>
 
-<form method="POST">
+        <input type="number"
+        step="0.01"
+        name="TotalCharges"
+        placeholder="Total Charges"
+        required>
 
-<input type="number"
-name="SeniorCitizen"
-placeholder="Senior Citizen (0/1)"
-required>
+        <br>
 
-<input type="number"
-name="tenure"
-placeholder="Tenure (Months)"
-required>
+        <button type="submit">
+        Predict
+        </button>
 
-<input type="number"
-step="0.01"
-name="MonthlyCharges"
-placeholder="Monthly Charges"
-required>
+        </form>
 
-<input type="number"
-step="0.01"
-name="TotalCharges"
-placeholder="Total Charges"
-required>
+        <div class="result">
+        {result}
+        </div>
 
-<button type="submit">
-Predict
-</button>
+        <br>
 
-</form>
+        <a href="/">
+            ← Back To Home
+        </a>
 
-<div class="result">
-{result}
-</div>
+    </div>
 
-<div class="footer">
-© 2026 Customer Churn Prediction Project
-</div>
-
-</div>
-
-</body>
-</html>
-'''
+    </body>
+    </html>
+    """
 
 
 if __name__ == "__main__":
